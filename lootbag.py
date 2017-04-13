@@ -3,10 +3,10 @@ import uuid
 
 class LootBag():
 
-	def write_child_to_file(self, child_name, action):
+	def write_child_to_file(self, child_name, action, delivered):
 		with open('children', action) as children:
 			child_id = uuid.uuid4()
-			children.write("{},{}\n".format(child_id, child_name))
+			children.write("{},{},{}\n".format(child_id, child_name, delivered))
 
 		return child_id
 
@@ -31,20 +31,20 @@ class LootBag():
 				all_children = children.readlines()
 
 				for child in all_children:
-					current_child_id, current_child_name = child.split(",")
+					current_child_id, current_child_name, delivered = child.split(",")
 					if current_child_name == child_name:
 						self.write_toy_to_file(toy, current_child_id, 'a')
 						return
 
-				new_child_id = self.write_child_to_file(child_name, 'a')
+				new_child_id = self.write_child_to_file(child_name, 'a', 'False')
 				self.write_toy_to_file(toy, new_child_id, 'a')
 
 		except FileNotFoundError:
-			new_child_id = self.write_child_to_file(child_name, 'w')
+			new_child_id = self.write_child_to_file(child_name, 'w', 'False')
 			self.write_toy_to_file(toy, new_child_id, 'a')
 
 	def list_toys_for_child(self, child_name):
-		'''Returns a list of toys for a specific child
+		'''Returns a list of toys for a specific child from the 'toylist' file.
 
 		Attributes:
 			child_name (string)
@@ -55,7 +55,7 @@ class LootBag():
 			all_children = children.readlines()
     	
 			for child in all_children:
-				current_child_id,current_child_name = child.split(",")
+				current_child_id,current_child_name, delivered = child.split(",")
 				if child_name == current_child_name.replace('\n',''):
 					child_id_on_toylist = current_child_id
     	
@@ -69,7 +69,7 @@ class LootBag():
 
 	def remove_toy_from_child(self, toy, child_name):
 
-		'''Removes a toy from the toy list
+		'''Removes a toy from the 'toylist' file.
 
 		Attributes:
 			toy (string)
@@ -81,7 +81,7 @@ class LootBag():
 		with open('children', 'r') as children:
 			all_children = children.readlines()
 			for child in all_children:
-				current_child_id,current_child_name = child.split(",")
+				current_child_id,current_child_name, delivered = child.split(",")
 				if child_name == current_child_name.replace('\n',''):
 					child_id_on_toylist = current_child_id
 
@@ -96,10 +96,20 @@ class LootBag():
 						toys.write(toy_line)
 
 	def get_single_child(self, child_name):
-		return {
-			'delivered': False
-		}
-
+		with open('children', 'r') as children:
+			all_children = children.readlines()
+			for child in all_children:
+				current_child_id,current_child_name, delivered = child.split(",")
+				if child_name == current_child_name.replace('\n',''):
+					if delivered.replace('\n','') == 'False':
+						return {
+							'delivered': False
+						}
+					if delivered.replace('\n','') == 'True':
+						return {
+							'delivered': True
+						}
+				
 	def deliver_toys_to_child(self, child_name):
 		return {
 			'delivered': True
@@ -114,7 +124,8 @@ class LootBag():
 #         bag.add_to_bag(sys.argv[2], sys.argv[3])
 
 
-
+bag = LootBag()
+bag.get_single_child('Vincent')
 
 
 
