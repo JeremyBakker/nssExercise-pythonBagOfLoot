@@ -20,7 +20,7 @@ class LootBag():
 		the child will be written to disk in the 'toylist' or 'children'
 		file, respectively
 
-		Attributes:
+		Arguments:
 			toy (string)
 			child_name (string)
 		'''
@@ -46,7 +46,7 @@ class LootBag():
 	def list_toys_for_child(self, child_name):
 		'''Returns a list of toys for a specific child from the 'toylist' file.
 
-		Attributes:
+		Arguments:
 			child_name (string)
 		'''
 		child_id_on_toylist = list()
@@ -71,7 +71,7 @@ class LootBag():
 
 		'''Removes a toy from the 'toylist' file.
 
-		Attributes:
+		Arguments:
 			toy (string)
 			child_name (string)
 		'''
@@ -100,35 +100,45 @@ class LootBag():
 			all_children = children.readlines()
 			for child in all_children:
 				current_child_id,current_child_name, delivered = child.split(",")
+				if delivered == 'False\n':
+					delivered = False
 				if child_name == current_child_name.replace('\n',''):
-					if delivered.replace('\n','') == 'False':
-						return {
-							'delivered': False
-						}
-					if delivered.replace('\n','') == 'True':
-						return {
-							'delivered': True
-						}
+					single_child = dict()
+					single_child[child_name] = {}
+					single_child[child_name] = {'delivered': delivered}
+					return single_child[child_name]
 				
 	def deliver_toys_to_child(self, child_name):
-		return {
-			'delivered': True
-		}
+		with open ('children', 'r') as children:
+			all_children = children.readlines()
+
+		with open ('children', 'w') as children:
+			child_to_append = ''
+			for child in all_children:
+				current_child_id,current_child_name, delivered = child.split(",")
+				if child_name != current_child_name:
+					children.write(child)
+				else: 
+					child_to_append = "{},{},{}\n".format(current_child_id, current_child_name, True)
+		
+		with open ('children', 'a') as children:
+			children.write(child_to_append)
+
+		single_child = dict()
+		single_child[child_name] = {}
+		single_child[child_name] = {'delivered': True}
+		return single_child[child_name]
 
 	def get_kids(self):
-		return ['Vincent']
+		with open ('children', 'r') as children:
+			child_list = []
+			all_children = children.readlines()
+			for child in all_children:
+				current_child_id,current_child_name, delivered = child.split(",")
+				child_list.append(current_child_name)
+			return child_list
 
 # if __name__ == "__main__":
 #     if sys.argv[1] == "add":
 #         bag = LootBag()
 #         bag.add_to_bag(sys.argv[2], sys.argv[3])
-
-
-bag = LootBag()
-bag.get_single_child('Vincent')
-
-
-
-
-
-
