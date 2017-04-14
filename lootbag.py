@@ -65,6 +65,7 @@ class LootBag():
 				toy_id, toy_name, child_id = toy.split(",")
 				if child_id_on_toylist == child_id.replace('\n',''):
 					toy_list_for_child.append(toy_name)
+		print(toy_list_for_child)
 		return toy_list_for_child
 
 	def remove_toy_from_child(self, toy, child_name):
@@ -138,7 +139,24 @@ class LootBag():
 				child_list.append(current_child_name)
 			return child_list
 
-# if __name__ == "__main__":
-#     if sys.argv[1] == "add":
-#         bag = LootBag()
-#         bag.add_to_bag(sys.argv[2], sys.argv[3])
+if __name__ == "__main__":
+    if sys.argv[1] == "add":
+        bag = LootBag()
+        bag.add_to_bag(sys.argv[2], sys.argv[3])
+
+    if sys.argv[1] == "remove":
+    	bag = LootBag()
+    	bag.remove_toy_from_child(sys.argv[2], sys.argv[3])
+
+    if sys.argv[1] == "ls":
+    	bag = LootBag()
+    	if sys.argv[2]:
+    		bag.list_toys_for_child(sys.argv[2])
+    	else:
+    		print(bag.get_kids())
+
+
+    if sys.argv[1] == "delivered":
+    	bag = LootBag()
+    	bag.deliver_toys_to_child(sys.argv[2])
+
